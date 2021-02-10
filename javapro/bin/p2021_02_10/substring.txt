@@ -1,0 +1,2 @@
+﻿substring(n) : index번호 n번 부터 끝까지 추출
+substring(n1, n2) : index번호 n1번 부터  (n2-1)번 까지 추출
