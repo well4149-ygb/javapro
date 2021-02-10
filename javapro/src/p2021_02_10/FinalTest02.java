@@ -14,10 +14,10 @@ class FinalEx extends FinalMethod{
   public void setA(int a) {
     this.a=a;
    }
-  public void setStr(String s) {
-    str+=s;
-    System.out.println(str);
-  }
+//  public void setStr(String s) {
+//    str+=s;
+//    System.out.println(str);
+//  }
 
 }
 public class FinalTest02{
