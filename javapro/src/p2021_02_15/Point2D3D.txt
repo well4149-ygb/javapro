@@ -1,0 +1,44 @@
+class Point2D{
+  private int x;
+  private int y;
+
+  public int getX( ){
+     return x;
+  }
+  public void setX(int new_X){
+    x=new_X;
+  }
+  public int getY( ){
+     return y;
+  }
+  public void setY(int new_Y){
+    y=new_Y;
+  }
+}
+
+
+class Point3D{
+  private int x;
+  private int y;
+  private int z;
+ 
+  public int getX( ){
+     return x;
+  }
+  public void setX(int new_X){
+    x=new_X;
+  }
+  public int getY( ){
+     return y;
+  }
+  public void setY(int new_Y){
+    y=new_Y;
+  }
+  public int getZ( ){
+     return z;
+  }
+  public void setZ(int new_Z){
+    z=new_Z;
+  }
+
+}
