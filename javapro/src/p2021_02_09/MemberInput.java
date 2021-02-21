@@ -89,6 +89,26 @@ public class MemberInput {
 	public String getAddress() {
 		return address;
 	}
+	
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
 
 
 	//생성자
