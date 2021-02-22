@@ -21,7 +21,7 @@ class  JDBC_Select{
       con = DriverManager.getConnection(url, "scott", "tiger" );
       stmt= con.createStatement();
       //---JDBC_Select 추가된 내용 -------
-      sql = "SELECT * FROM customer";
+      sql = "SELECT * FROM customer order by no asc";
       System.out.printf("번호 \t 이름 \t\t 이메일 \t\t 전화번호 \n");
       System.out.printf("-----------------------------------------------------------------\n");
       rs = stmt.executeQuery(sql);  //얻어진 레코드를 가져옴
