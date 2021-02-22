@@ -1,0 +1,3 @@
+create table mem01(name  varchar2(20),
+		   email  varchar2(20),
+		   phone  varchar2(20));
