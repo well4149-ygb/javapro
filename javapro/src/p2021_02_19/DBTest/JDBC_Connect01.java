@@ -12,7 +12,7 @@ public class JDBC_Connect01{
 /******************************************************/
 
 /** My-SQL JDBC Driver Test **************************/	
-//	String driver ="com.mysql.jdbc.Driver";
+//	String driver ="com.mysql.cj.jdbc.Driver";
 /*****************************************************/
 
     try{
