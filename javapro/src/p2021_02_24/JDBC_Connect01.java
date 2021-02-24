@@ -1,4 +1,4 @@
-package p2021_02_19.DBTest;
+package p2021_02_24;
 
 
 import java.sql.*;
@@ -8,11 +8,11 @@ public class JDBC_Connect01{
   public static void main(String[] args)  {
 
 /** ORACLE JDBC Driver Test ***************************/
-//	String driver = "oracle.jdbc.driver.OracleDriver";  
+	String driver = "oracle.jdbc.driver.OracleDriver";  
 /******************************************************/
 
 /** My-SQL JDBC Driver Test **************************/	
-	String driver ="com.mysql.jdbc.Driver";
+//	String driver ="com.mysql.cj.jdbc.Driver";
 /*****************************************************/
 
     try{
