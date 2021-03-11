@@ -12,5 +12,6 @@ public class Main {
 		
 		Timestamp ts = new Timestamp(System.currentTimeMillis());
 		System.out.println(ts);
+		
 	}
 }
