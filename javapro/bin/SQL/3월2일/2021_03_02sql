@@ -1,0 +1,355 @@
+---2021 0302 화
+
+---ansi join
+---미국 표준 협회 표준안에 따라서 만들어진 join 방법
+
+---ansi cross join
+select * from dept cross join emp;
+select * from emp cross join dept;
+
+---ansi inner join
+---scott 사원이 소속된 부서명을 출력하는 sql문?//테이블 순서가 바뀌어도 o.k
+select ename,dname from dept inner join emp
+ on dept.deptno = emp. deptno where ename = 'SCOTT';
+ 
+ ----using 을 이용
+ select ename, dname from dept inner join emp
+ using(deptno) where ename ='SCOTT';
+ 
+ ---ansi natural join
+ --dept와emp 테이블 사이의 공통컬럼이 같다는 의미를 가지고 있음.
+ select ename, dname from dept NATURAL JOIN emp where ename ='SCOTT';
+ 
+ ----ansi outer join
+ ---select * from table1 [left | right | full ] outer join table2 ->on,using
+ --조건을 사용함;
+ drop table dept01 purge;----임시테이블로 교체하지 않고 깨끗하게 테이블을 삭제
+ purge recyclebin;------임시테이블 삭제
+ 
+ ---dept01테이블
+ create table dept01(
+ deptno number(2),
+ dname varchar2(14));
+ select * from dept01;
+ ----dept02 테이블
+ create table dept02(
+ deptno number(2),
+ dname varchar2(15));
+ select * from dept02;
+ ---dept01테이블에 값입력
+ insert into dept01 values(10,'ACCOUNTING');
+ insert into dept01 values(20,'RESEARCH');
+ ---dept02테이블에 값입력
+ INSERT into dept02 values(10,'ACCOUNTING');
+ insert into dept02 values(30,'SALES');
+ 
+ ---ansi join 예
+ ---dept01테이블의 정보만 출력됨
+ select * from dept01 left outer join dept02 using(deptno);
+ 
+ ---right outer join
+ ----dept02테이블의 정보만 출력
+ select * from dept01 right outer join dept02 using(deptno);
+ 
+ ---full outer join
+ ---dept01,02 의 모든 데이터를 출력함.
+ select *from dept01 full outer join dept02 using(deptno);
+ 
+ -----서브쿼리
+ ---q.SCOTT사원이 소속된 부서명을 구하는 sql문?
+ ----join으로 구하기
+ select dname from dept, emp where dept.deptno = emp.deptno and ename='SCOTT';
+ ----inner join 
+ select dname from dept inner join emp on dept.deptno = emp.deptno where ename='SCOTT';
+ select dname from dept inner join emp using(deptno) where ename = 'SCOTT';
+ select dname from dept natural join emp where ename = 'SCOTT';
+ 
+ ----서브쿼리로 구하기
+ select dname from dept where deptno = ---메인 쿼리
+ (select deptno from emp where ename ='SCOTT'); ----서브쿼리
+ 
+ ---1.단일행 서브쿼리
+ --- 1) 서브쿼리의 검색 결과가 1개만 반환되는 쿼리
+ --- 2) 메인 쿼리의 where 조건절에서 비교 연산자만 사용(=,>,>=,<,<=)
+ 
+ ----Q.사원테이블에서 가장 최근에 입사한 사원의 이름을 구하는 sql문.
+ select ename from emp where hiredate = 
+ (select max(hiredate) from emp);
+ 
+  -- Q1.사원테이블에서 가장 최근에 입사한 사원명을 출력하는 SQL문 작성?
+ select ename from emp where hiredate = 
+    (select max(hiredate) from emp);
+    
+--Q2. 사원 테이블에서 최대 급여를 받는 사원명과 최대급여 금액을 출력하는 SQL문 작성?
+select ename, max(sal) from emp;--오류발생:그룹함수와 일반컬럼은 같이 사용할 수 없다.
+select ename, sal from emp where sal = (select max(sal) from emp);
+ 
+--Q3. SCOTT의 급여(SAL)와 동일하거나 SCOTT보다 더 많은 급여를 받는 사원명과 급여를
+--    출력하는 SQL문 작성?
+select ename, sal from emp where sal >= 
+    (select sal from emp where ename = 'SCOTT');      -- 3000
+    
+--Q4. 직속상관(MGR)이 KING인 사원의 사원명과 급여를 출력하는 SLQ문 작성?
+select ename, sal from emp where mgr =
+    (select empno from emp where ename = 'KING');      -- 7839
+ 
+ -------------------------------------------------------------------------   
+-- 과제.
+-- Q1. 직급이 MANAGER인 사원의 이름, 부서명을 출력하는 SQL문을
+--     작성 하세요? (JOIN을 사용하여 처리)   
+select ename, dname from emp, dept 
+                  where emp.deptno=dept.deptno  and  job='MANAGER';     
+select ename, dname from emp inner join dept 
+                     on emp.deptno=dept.deptno  where  job='MANAGER'; 
+select ename, dname from emp inner join dept 
+                     using(deptno)  where  job='MANAGER'; 
+select ename, dname from emp natural join dept 
+                     where job='MANAGER';   
+                     
+-- Q2. 매니저가 KING 인 사원들의 이름과 직급을 출력하는 SQL문 작성?  
+-- JOIN 으로 구하기
+select employee.ename, employee.job 
+                   from emp employee, emp manager
+                   where employee.mgr=manager.empno and manager.ename='KING';
+-- 서브쿼리로 구하기
+select ename, job from emp where mgr = 
+                 (select empno from emp where ename='KING');    -- 7839
+                 
+--  Q3. SCOTT과 동일한 근무지에서 근무하는 사원의 이름을 출력하는 SQL문 작성?                 
+select deptno, ename from emp 
+                   where deptno = (select deptno from emp where ename = 'SCOTT'); 
+                   
+-----------------------------------------------------------------------------------
+--2. 다중행 서브쿼리
+--   1) 서브 쿼리에서 반환되는 검색 결과가 2개 이상인 서브쿼리
+--   2) 메인 쿼리의 where 조건절에서 다중행 연산자(in, all, any,...)를 사용해야 된다.
+
+--in 연산자
+--: 서브쿼리의 검색 결과 중에서 하나라도 일치되면 참이 된다.
+
+--Q. 급여를 3000이상 받는 사원이 소속된 부서와 동일한 부서에서 근무하는 사원들의 
+--   정보를 출력하는 SQL문 작성?
+
+-- 각 부서별 최대급여 금액 구하기
+select deptno, max(sal) from  emp group by deptno;  -- 10, 20번 부서
+--30	2850
+--20	3000
+--10	5000
+
+select ename, sal, deptno from emp where deptno in
+    (select distinct deptno from emp where sal >= 3000);     -- 10, 20
+    
+-- all연산자
+-- : 메인 쿼리의 비교 조건이 서브쿼리의 검색 결과와 모든 값이 일치하면 참이된다.
+--Q. 30번 부서에 소속된 사원 중에서 급여를 가장 많이 받는 사원보다 더 많은 급여를 
+--    받는 사원의 이름과 급여를 출력하는 SQL문 작성?
+
+-- 30번 부서 소속 사원 중에서 최대 급여 금액 구하기
+select max(sal) from emp where deptno = 30;         -- 2850
+
+-- 1) 단일행 서브쿼리로 구하기
+select ename, sal from emp where sal >
+    (select max(sal) from emp where deptno = 30);   -- 2850
+-- 2) 다중행 서브쿼리로 구하기
+select ename, sal from emp where sal >all
+    (select sal from emp where deptno = 30);    -- 다중행 서브쿼리
+    
+--any 연산자
+--: 메인 쿼리의 비교 조건이 서브쿼리의 검색 결과와 하나 이상 일치되면 참이된다.
+--Q. 부서번호가 30번인 사원들의 급여중 가장 낮은 급여(950)보다 더 많은 급여를 받는
+--   사원명과 급여를 출력하는 SQL문 작성?
+
+-- 30번 부서의 가장 낮은 급여 구하기
+select min(sal) from emp where deptno=30;   -- 950
+
+--1) 단일행 서브쿼리로 구하기
+select ename, sal from emp where sal >
+    (select min(sal) from emp where deptno=30); -- 단일행 서브쿼리 : 950
+--2) 다중행 서브쿼리로 구하기
+select ename, sal from emp where sal >any
+    (select sal from emp where deptno = 30);    -- 다중행 서브쿼리 
+-----단일행 서브쿼리만 알고 있어도 괜찮음.
+-- 2021.03.02(화)
+
+--DDL(Data Definition Language) : 데이터 정의어
+-- create : 테이블 생성
+-- alter : 테이블 구조 변경
+-- rename : 테이블 이름 변경
+-- drop : 테이블 삭제
+-- truncate : 데이터 삭제
+
+-- 테이블 목록 확인
+select * from tab;
+
+--1. create
+--  : 데이터베이스, 테이블 생성
+--  1) 테이블 생성
+create table emp01(
+    empno number(4),
+    ename varchar2(20),
+    sal number(7,2));
+    
+--  2) 서브쿼리로 테이블 생성
+--     복사본 테이블이 생성됨
+--     단, 제약조건은 복사 되지 않는다.
+drop table emp02 purge;
+create table emp02 as select * from emp;
+select * from emp02;
+desc emp02;
+
+
+---원하는 컬럼으로 구성된 복사본 테이블 구성
+create table emp03 as select empno,ename from emp;
+select * from emp03;
+desc emp03;
+
+--원하는 행으로 구성된 복사본 테이블 생성
+create table emp04 as select * from emp where deptno =10;
+select * from emp04;
+
+---테이블 구조만 복사하기
+create table emp05 as select * from emp where 1 =0;
+select * from emp05;
+ 
+ ---2.alter
+ ---:테이블 구조를 변경(컬럼추가,컬럼값을 수정,컬럼값을 삭제)
+ ---1)컬럼 추가
+ 
+ alter table emp01 add(job VARCHAR2(10));
+ desc emp01;
+ 
+ ---2)컬럼값을 수정
+---i) 해당 컬럼에 데이터가 없는 경우
+---   컬럼에 데이터 타입을 변경 할 수 있다.
+---   컬럼의 크기를 변경할 수 있다.
+---ii)해당 컬럼에 데이터가 있는 경우
+---   컬럼의 데이터 타입을 변경할 수 없다.
+----  자료형의 크기는 늘릴수 있지만, 
+----  현재의 데이터의 크기보다 작은 크기로 변경은 불가능하다.
+----  
+alter table emp01 MODIFY(job VARCHAR2(30));
+desc emp01;
+
+----3)컬럼을 삭제->2가지 방법이 있음.
+alter table emp01 drop COLUMN job;
+alter table emp01 drop(job);
+desc emp01;
+
+---cf.비번 변경
+alter user 계정명 identified by 비밀번호;
+
+--3.rename
+--:테이블 이름 변경
+-- 형식: rename old_name to new_name;
+--Q. emp01 테이블을 test 테이블명으로 변경 해보자
+rename emp01 to test;
+desc test;
+select * from tab;
+
+---4. truncate 
+-- :테이블의 모든 데이터 삭제
+--형식: truncate table table_name;
+select * from emp02;
+truncate table emp02;
+
+---5.drop
+--- :테이블 삭제(자체를 삭제)
+--- 형식: drop table table_name;(oracle 10g부터는 삭제가 되지 않고 임시테이블이 남아있다,)
+---drop table table_name purge;(깨끗하게 삭제됨)
+drop table test;---임시 테이블로 교체
+select * from tab;
+
+---임시 테이블 삭제
+purge recyclebin;
+
+-- 1.오라클의 객체
+--    테이블, 뷰, 시퀀스, 인덱스, 동의어, 프로시저, 트리거
+
+-- 2. 데이터 딕셔너리와 데이터 딕셔너리 뷰
+
+--    데이터 딕셔너리 뷰 : user_xxxx
+--    (가상 테이블)       all_xxxx
+--                      dba_xxxx
+
+ --   데이터 딕셔너리(시스템 테이블)
+ 
+ -- SCOTT 계정 소유의 테이블 객체에 대한 정보를 조회
+select * from tab;
+
+select * from user_tables;
+
+-- 자신 계정 소유 또는 권한을 부여받은 객체 등에 관한 정보를 조회
+select * from all_tables;
+
+-- DBA 계정만 사용 가능함.
+select * from dba_tables;
+
+-- 오라클 시스템의 계정 정보 검색
+select * from dba_users;
+
+-------------------------------------------------------------------------
+-- DML(Data Manipulation Language, 데이터 조작어) : insert, update, delete
+
+--1. insert
+--1)형식 : insert into 테이블(컬럼1, 컬럼2,...) values(데이터1, 데이터2,...);  
+--        insert into 테이블  values(데이터1, 데이터2, ....);
+
+-- [실습]
+drop table dept01 purge;
+
+-- 비어있는 dept01 복사본 테이블 생성
+create table dept01 as select * from dept where 1=0;
+
+select * from dept01;
+
+insert into dept01(deptno, dname, loc) values(10, 'ACCOUNTING', 'NEW YORK');
+insert into dept01 values(20, 'RESEARCH', 'DALLAS');
+insert into dept01 values(30, '영업부', '서울');
+
+-- null 값 입력
+insert into dept01(deptno, dname) values(40, '개발부');
+insert into dept01 values(50, '기획부', NULL);
+
+-- 2)서브쿼리로 데이터 입력
+drop table dept02 purge;
+
+-- dept02 테이블 생성
+create table dept02 as select * from dept where 1=0;   --테이블 구조만 복사
+select * from dept02;
+select count(*) from dept02;
+
+insert into dept02 select * from dept;
+insert into dept02 select * from dept02;
+
+--2. update : 데이터 수정
+-- 형식 : update  테이블명  set  컬럼1 = 수정할 값1,
+--                             컬럼2 = 수정할 값2,...
+--        where  조건절;
+
+--[실습]
+drop table emp01 purge;
+create table emp01 as select * from emp;    -- 복사본 테이블 생성
+select * from emp01;
+
+-- 1) 모든 데이터 수정
+-- Q1. 모든 사원들의 부서번호를 30번 수정
+update emp01 set deptno = 30;
+
+--Q2. 모든 사원들의 입사일을 오늘날짜로 수정
+update emp01 set hiredate = sysdate;
+
+-- 2) 특정 데이터만 수정 : where 조건절 사용
+--Q3. 급여가 3000 이상인 사원만 급여를 10% 인상 
+update emp01 set sal = sal * 1.1 where sal >= 3000;
+
+--3. delete : 데이터 삭제
+-- 형식 : delete from 테이블명  where 조건절; 
+
+-- 1) 모든 데이터 삭제
+delete from dept01;
+select * from dept01;
+rollback;               -- 트랜잭션을 취소
+
+-- 2) 조건을 만족하는 데이터 삭제
+delete from dept01 where deptno = 30;
+
